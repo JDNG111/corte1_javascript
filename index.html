@@ -225,6 +225,7 @@
         table {
             border-collapse: collapse;
             margin-top: 20px;
+            height: 300px;
         }
         th, td {
             border: 1px solid black;
@@ -306,6 +307,7 @@
     <!-- final del código de cursor para el blog o página web -->
 </head>
 <body>
+    
     <h1 id="titulo">Programación Web - Corte 1</h1>
     <div id="contenedor-centrado">
     <img id="imagen" src="https://raw.githubusercontent.com/JDNG111/imagenes/main/equation.png" alt="Ecuación">
@@ -393,18 +395,23 @@
         }
 
         function mostrarResultados(errores, totalCiclos) {
-            let totalErrores = Object.values(errores).reduce((a, b) => a + b, 0);
-            let html = `
-                <table class="table table-success table-striped">
-                    <tr><th>Tipo de Error</th><th>Total</th><th>Porcentaje de Errores</th></tr>
-            `;
-            for (let tipo in errores) {
-                let porcentajeErrores = (errores[tipo] / totalErrores * 100).toFixed(2);
-                html += `<tr><td>${tipo}</td><td>${errores[tipo]}</td><td>${porcentajeErrores}%</td></tr>`;
-            }
-            html += '</table>';
-            document.getElementById('resultadosContainer').innerHTML = html;
-        }
+    let totalErrores = Object.values(errores).reduce((a, b) => a + b, 0);
+    let html = `
+        <div style="height: 300px;">
+            <table class="table table-success table-striped">
+                <tr><th>Tipo de Error</th><th>Total</th><th>Porcentaje de Errores</th></tr>
+    `;
+    for (let tipo in errores) {
+        let porcentajeErrores = (errores[tipo] / totalErrores * 100).toFixed(2);
+        html += `<tr><td>${tipo}</td><td>${errores[tipo]}</td><td>${porcentajeErrores}%</td></tr>`;
+    }
+    html += `
+            </table>
+        </div>
+    `;
+    document.getElementById('resultadosContainer').innerHTML = html;
+}
+
 
 
         google.charts.load('current', {'packages':['corechart']});
@@ -420,16 +427,54 @@ function dibujarGrafico(errores, totalCiclos) {
             ['Errores de logaritmo natural', errores.logaritmoNatural]
         ]);
 
-        var options = {
-            title: 'Distribución de Errores',
-            is3D: true,
+        var baseOptions = {
             width: '100%',
-            height: 400
+            height: 400,
+            chartArea: {width: '80%', height: '80%'},
+            legend: {position: 'right', textStyle: {fontSize: 12}},
+            titleTextStyle: {fontSize: 18, bold: true},
+            animation: {
+                startup: true,
+                duration: 1000,
+                easing: 'out',
+            },
+        };
+
+        var pieOptions = {
+            ...baseOptions,
+            title: 'Distribución de Errores (Gráfico de Pastel)',
+            is3D: false,
+            pieHole: 0.4,
+            slices: {
+                0: { color: '#007bff' },
+                1: { color: '#28a745' },
+                2: { color: '#dc3545' },
+                3: { color: '#ffc107' },
+                4: { color: '#17a2b8' }
+            },
+            pieSliceTextStyle: {
+                color: 'white',
+            },
+        };
+
+        var columnOptions = {
+            ...baseOptions,
+            title: 'Distribución de Errores (Gráfico de Columnas)',
+            bar: {groupWidth: "65%"},
+            colors: ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8'],
+        };
+
+        var barOptions = {
+            ...baseOptions,
+            title: 'Distribución de Errores (Gráfico de Barras)',
+            bars: 'horizontal',
+            bar: {groupWidth: "65%"},
+            colors: ['#6610f2', '#fd7e14', '#20c997', '#e83e8c', '#6f42c1'],
         };
 
         // Dibujar el primer gráfico cuando se carga la página
         var chart1 = new google.visualization.PieChart(document.getElementById('chart1'));
-        chart1.draw(data, options);
+        chart1.draw(data, pieOptions);
 
         // Inicializar el carrusel de Bootstrap
         var carouselElement = document.getElementById('chartCarousel');
@@ -452,13 +497,13 @@ function dibujarGrafico(errores, totalCiclos) {
 
                 if (chartId === 'chart1') {
                     var chart1 = new google.visualization.PieChart(document.getElementById('chart1'));
-                    chart1.draw(data, options);
+                    chart1.draw(data, pieOptions);
                 } else if (chartId === 'chart2') {
                     var chart2 = new google.visualization.ColumnChart(document.getElementById('chart2'));
-                    chart2.draw(data, options);
+                    chart2.draw(data, columnOptions);
                 } else if (chartId === 'chart3') {
                     var chart3 = new google.visualization.BarChart(document.getElementById('chart3'));
-                    chart3.draw(data, options);
+                    chart3.draw(data, barOptions);
                 }
             }
         });
@@ -698,30 +743,33 @@ function dibujarGrafico(errores, totalCiclos) {
         }, 7000);
     </script>
 
-        <style>
-            .calendar-container {
-                position: absolute;
-                top: 0;
-                left: 0;
-            }
+<style>
+    .calendar-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        width: 200px; /* Ajusta el tamaño según sea necesario */
+        height: 200px; /* Ajusta el tamaño según sea necesario */
+        border: none; /* Elimina el borde del iframe */
+    }
+</style>
+<iframe class="calendar-container" src="about:blank" title="Escudo de la Universidad Libre de Colombia"></iframe>
+
+<script>
+    document.querySelector('.calendar-container').contentWindow.document.body.innerHTML = '<img src="https://raw.githubusercontent.com/JDNG111/imagenes/main/Escudo_de_la_Universidad_Libre_de_Colombia.svg.png" alt="Escudo de la Universidad Libre de Colombia" style="width: 100%; height: 100%;">';
+</script>
+
+
+
         
-            .calendar-container iframe {
-                pointer-events: none;
-            }
-        </style>
-        
-        <div class="calendar-container">
-            <iframe 
-                src="https://widget.calendarlabs.com/v1/calendar.php?cid=1002&uid=6143778325&c=8&l=en&cbg=FFFFFF&cfg=5C0201&hfg=5C0201&hfg1=5C0201&ct=60&cb=0&cbc=5C0201&cf=verdana&cp=bottom&sw=0&hp=t&ib=1&ibc=5C0201&i=images/golden-retriever.jpg"
-                width="183" height="373" marginwidth="0" marginheight="0" frameborder="no" scrolling="no" allowtransparency="true">
-                Loading...
-            </iframe>
-            <script type="text/javascript"></script>
-        </div>
 
         <a href="http://www.pczeros.net/2014/02/agregar-camara-de-vigilancia-en-blogger.html" style="right: 0px; position: fixed; top: 0px; pointer-events: none;"><img src="http://i.imgur.com/IUzZhG3.gif" alt="Cámara de vigilancia"/></a><script type="text/JavaScript"/>
         
     </div>
+
+
+
 
  
 </body>
